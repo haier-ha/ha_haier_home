@@ -1,0 +1,118 @@
+[build-system]
+requires = ["setuptools==78.1.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ha-haier-home"
+version = "1.0.0"
+description = "Haier Home integration for Home Assistant"
+readme = "README.md"
+requires-python = ">=3.14.2"
+license = "Apache-2.0"
+authors = [
+    { name = "Haier Home Integration Authors" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Home Automation",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==4.1.0",
+    "pytest-homeassistant-custom-component==0.13.354",
+    "ruff==0.16.3",
+    "mypy==1.10.1",
+    "homeassistant==2026.8.0",
+    "aiohttp==3.14.3",
+]
+
+[tool.ruff]
+required-version = "0.16.3"
+line-length = 100
+target-version = "py314"
+exclude = [
+    ".git",
+    ".tox",
+    ".venv",
+    "__pycache__",
+    "*.pyc",
+    "*.pyo",
+    ".ruff_cache",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "C4", "UP", "PL", "SIM", "RET", "BLE", "SLF", "TRY"]
+ignore = [
+    "E501",
+    "B006",
+    "C901",
+    "SIM108",
+    "PLR0913",
+    "PLR0912",
+    "PLR0915",
+    "PLR0917",
+    "PLC0415",
+    "SIM117",
+    "TRY002",
+    "TRY003",
+    "BLE001",
+    "SLF001",
+    "PLR2004",
+    "PLR1714",
+    "W291",
+    "W293",
+]
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pylint]
+max-returns = 8
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.mypy]
+files = ["custom_components"]
+python_version = "3.14"
+mypy_path = ["custom_components"]
+explicit_package_bases = true
+strict = false
+show_error_codes = true
+ignore_missing_imports = true
+follow_imports = "silent"
+exclude = [
+    ".git",
+    ".tox",
+    ".venv",
+    "__pycache__",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_files = ["test_*.py"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--asyncio-mode=auto",
+]
+filterwarnings = [
+    "error::DeprecationWarning",
+    "ignore::DeprecationWarning:homeassistant.*",
+]
+
+[tool.pytest_cov]
+cov_report = {show_missing = true}
+cov_fail_under = 80

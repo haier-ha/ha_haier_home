@@ -1,0 +1,6 @@
+[run]
+source = custom_components/haier_home
+
+[report]
+show_missing = true
+fail_under = 80

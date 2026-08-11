@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.env/
+.venv/
+.envrc
+pyvenv.cfg
+Pipfile*
+uv.lock
+
+# Testing
+.pytest_cache/
+.cache/
+.coverage
+coverage.xml
+htmlcov/
+test-results.xml
+
+# Linting and type checking
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+.project
+.pydevproject
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Build
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+
+# Logs
+*.log
+pip-log.txt
+
+# Home Assistant
+config/
+config2/*
+tests/testing_config/deps
+tests/testing_config/home-assistant.log*
+.homeassistant/
+test_config/
+
+# Secrets
+.secrets.yaml
+.token
+
+# Translation
+custom_components/*/translations/*.mo
+
+# AI tools
+.claude/
+.serena/
+*.data.md
+*.data.json
+test*.script.py
+hacs
+wiki.*
+
+# Internal / security-sensitive docs (do not commit)
+docs/internal/
+.trae/
+.agents/
+dumps/

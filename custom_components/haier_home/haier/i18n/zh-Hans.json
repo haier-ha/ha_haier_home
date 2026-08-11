@@ -1,0 +1,25 @@
+{
+    "oauth_title": "授权",
+    "oauth_desc": "请授权您的海尔账号。",
+    "homes_title": "请选择家庭与设备",
+    "homes_desc": "**导入家庭设备**\n\n完成集成绑定后，可一键添加所选家庭下全部海尔智能设备，快速完成设备批量接入。\n\n**房间名称同步规则**\n\n将海尔智家 APP 设备同步至 Home Assistant 时，设备所属空间命名遵循以下规则，同步操作不会改动海尔智家 APP 内原有家庭、房间布局与设置：\n\n• 不同步空间：接入设备不归属任何空间分区\n\n• 对应同步模式：直接沿用海尔智家 APP 内的家庭名、房间名，作为 HA 端设备所属空间名称",
+    "homes_label": "导入家庭设备",
+    "room_sync_label": "房间名同步模式",
+    "scene_sync_label": "场景同步",
+    "default_mark": "【默认】",
+    "room_sync_options": {
+        "none": "不同步",
+        "family_and_room": "家庭名 和 房间名（我的家 一层 卧室）",
+        "room_only": "房间名（一层 卧室）",
+        "family_only": "家庭名（我的家）"
+    },
+    "scene_sync_options": {
+        "all_manual": "同步全部场景",
+        "none": "不同步场景"
+    },
+    "oauth_page_success_title": "授权成功！",
+    "oauth_page_success_desc": "海尔智家授权已完成，请关闭此页面并返回 Home Assistant 继续配置。",
+    "oauth_page_fail_title": "授权失败",
+    "oauth_page_fail_missing_params": "缺少授权参数。",
+    "oauth_page_fail_expired": "授权会话已过期或无效。"
+}

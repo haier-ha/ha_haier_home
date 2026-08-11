@@ -1,0 +1,75 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "海尔智家",
+                "description": "欢迎使用海尔智家集成。"
+            },
+            "eula": {
+                "title": "风险告知",
+                "description": "{eula_text}",
+                "data": {
+                    "eula_accepted": "我已悉知以上全部风险条款，并自愿承担因使用此集成所产生的一切相关风险与责任。"
+                },
+                "submit_button": "下一步"
+            },
+            "region": {
+                "title": "区域与语言",
+                "description": "**选择您的云服务器区域和首选语言**\n\n认证跳转地址为 **`http://homeassistant.local:8123`** ，Home Assistant 需要与当前操作终端（例如，个人电脑）在同一局域网内，且操作终端能通过该地址访问 Home Assistant 首页，否则登录认证可能会失败。\n\n**注意事项**\n- 对于数百个及以上海尔设备的用户，首次添加集成会耗费一些时间，请耐心等待。\n- 如果 Home Assistant 运行在 docker 环境下，请确保 docker 网络模式为 host，否则会导致本地控制功能异常。",
+                "data": {
+                    "region": "区域",
+                    "language": "语言"
+                },
+                "submit_button": "下一步"
+            },
+            "oauth": {
+                "title": "{oauth_title}",
+                "description": "{oauth_desc}"
+            },
+            "homes": {
+                "title": "{homes_title}",
+                "description": "{homes_desc}",
+                "data": {
+                    "homes": "{homes_label}",
+                    "room_sync_mode": "{room_sync_label}",
+                    "scene_sync": "{scene_sync_label}"
+                },
+                "submit_button": "提交"
+            }
+        },
+        "error": {
+            "eula_not_accepted": "请阅读风险告知文本",
+            "no_homes_selected": "请至少选择一个家庭。"
+        },
+        "abort": {
+            "already_configured": "该账号已配置。"
+        }
+    },
+    "selector": {
+        "region": {
+            "options": {
+                "cn": "中国大陆"
+            }
+        }
+    },
+    "entity": {
+        "climate": {
+            "haier_climate": {
+                "state_attributes": {
+                    "fan_mode": {
+                        "state": {
+                            "auto": "自动",
+                            "fast": "快速",
+                            "high": "高速",
+                            "mid_high": "中高",
+                            "medium": "中速",
+                            "mid_low": "中低",
+                            "low": "低速",
+                            "quiet": "微风"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

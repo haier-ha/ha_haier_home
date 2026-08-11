@@ -1,0 +1,18 @@
+{
+    "entity": {
+        "climate": {
+            "haier_climate": {
+                "state_attributes": {
+                    "fan_mode": {
+                        "state": {
+                            "quiet": "mdi:leaf",
+                            "fast": "mdi:rocket-launch",
+                            "mid_high": "mdi:fan-chevron-up",
+                            "mid_low": "mdi:fan-chevron-down"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

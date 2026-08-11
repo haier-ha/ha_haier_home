@@ -1,0 +1,7 @@
+{
+    "name": "Haier Smart Home",
+    "homeassistant": "2026.9.0",
+    "render_readme": true,
+    "country": "CN",
+    "hacs": "1.0.0"
+}

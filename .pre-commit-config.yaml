@@ -1,0 +1,60 @@
+---
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: ruff-check
+        entry: ruff
+        language: system
+        types_or: [python, pyi]
+        args:
+          - check
+          - --fix
+        files: ^((custom_components|tests)/.+)?[^/]+\.(py|pyi)$
+
+      - id: ruff-format
+        name: ruff-format
+        entry: ruff
+        language: system
+        types_or: [python, pyi]
+        args:
+          - format
+        files: ^((custom_components|tests)/.+)?[^/]+\.(py|pyi)$
+
+      - id: codespell
+        name: codespell
+        entry: codespell
+        language: system
+        types: [text]
+        args:
+          - --ignore-words-list=aiport,astroid,checkin,currenty,hass,iif,incomfort,lookin,nam,NotIn
+          - --skip="./.*,*.csv,*.json,*.ambr"
+          - --quiet-level=2
+        exclude_types: [csv, json, html]
+
+      - id: yamllint
+        name: yamllint
+        entry: yamllint
+        language: system
+        types: [yaml]
+
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        require_serial: true
+        types_or: [python, pyi]
+        files: ^(custom_components|tests)/.+\.(py|pyi)$
+        args:
+          - --ignore-missing-imports
+          - --explicit-package-bases
+
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        types: [python]
+        files: ^tests/.+\.py$
+        args:
+          - --tb=short

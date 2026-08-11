@@ -1,0 +1,25 @@
+{
+    "oauth_title": "Authorization",
+    "oauth_desc": "Please authorize your Haier account.",
+    "homes_title": "Select Homes & Devices",
+    "homes_desc": "**Import Home Devices**\n\nAfter binding, all smart devices under the selected homes will be added.\n\n**Room Name Sync Rules**\n\nWhen syncing devices to Home Assistant, device area names follow these rules (this will NOT change your Haier Smart Home APP settings):\n\n• No sync: Devices will not be assigned to any area\n\n• Sync mode: Uses home name and/or room name from Haier Smart Home APP as HA area name",
+    "homes_label": "Import Home Devices",
+    "room_sync_label": "Room Name Sync Mode",
+    "scene_sync_label": "Scene Sync",
+    "default_mark": " [Default]",
+    "room_sync_options": {
+        "none": "Do not sync",
+        "family_and_room": "Home name and room name (My Home / 1F / Bedroom)",
+        "room_only": "Room name (1F / Bedroom)",
+        "family_only": "Home name (My Home)"
+    },
+    "scene_sync_options": {
+        "all_manual": "Sync all scenes",
+        "none": "Do not sync scenes"
+    },
+    "oauth_page_success_title": "Authorization Successful!",
+    "oauth_page_success_desc": "Haier Smart Home authorization is complete. Please close this page and return to Home Assistant to continue setup.",
+    "oauth_page_fail_title": "Authorization Failed",
+    "oauth_page_fail_missing_params": "Missing authorization parameters.",
+    "oauth_page_fail_expired": "The authorization session has expired or is invalid."
+}

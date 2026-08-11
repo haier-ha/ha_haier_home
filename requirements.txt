@@ -1,0 +1,5 @@
+# Runtime requirements for Haier Home custom component
+# Target: Home Assistant >= 2026.8
+# Python >= 3.14
+
+aiohttp>=3.13.5

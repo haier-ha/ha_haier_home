@@ -1,0 +1,71 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Haier Home",
+                "description": "Welcome to Haier Home integration."
+            },
+            "eula": {
+                "title": "Risk Disclosure",
+                "description": "{eula_text}",
+                "data": {
+                    "eula_accepted": "I acknowledge all of the above risk terms and voluntarily assume all related risks and responsibilities arising from the use of this integration."
+                },
+                "submit_button": "Next"
+            },
+            "region": {
+                "title": "Region & Language",
+                "description": "**Select your cloud server region and preferred language**\n\nThe authentication redirect URL is **`http://homeassistant.local:8123`** . Home Assistant must be on the same local network as the terminal you are currently using (e.g. your personal computer), and that terminal must be able to access the Home Assistant home page via this URL; otherwise the login authentication may fail.\n\n**Notes**\n- For users with hundreds or more Haier devices, the first-time integration setup may take a while. Please be patient.\n- If Home Assistant runs in a Docker environment, make sure the Docker network mode is set to host; otherwise local control may not work properly.",
+                "data": {
+                    "region": "Region",
+                    "language": "Language"
+                },
+                "submit_button": "Next"
+            },
+            "oauth": {
+                "title": "{oauth_title}",
+                "description": "{oauth_desc}"
+            },
+            "homes": {
+                "title": "{homes_title}",
+                "description": "{homes_desc}",
+                "data": {
+                    "homes": "{homes_label}",
+                    "room_sync_mode": "{room_sync_label}",
+                    "scene_sync": "{scene_sync_label}"
+                },
+                "submit_button": "Submit"
+            }
+        },
+        "error": {
+            "eula_not_accepted": "Please read the risk disclosure text.",
+            "no_homes_selected": "Please select at least one home."
+        },
+        "abort": {
+            "already_configured": "This account is already configured."
+        }
+    },
+    "selector": {
+        "region": {
+            "options": {
+                "cn": "Chinese Mainland"
+            }
+        }
+    },
+    "entity": {
+        "climate": {
+            "haier_climate": {
+                "state_attributes": {
+                    "fan_mode": {
+                        "state": {
+                            "quiet": "Quiet",
+                            "fast": "Fast",
+                            "mid_high": "Mid-High",
+                            "mid_low": "Mid-Low"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
