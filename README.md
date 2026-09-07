@@ -8,18 +8,19 @@
 
 ## 功能特性
 
-- ✅ OAuth2 认证
+- ✅ OAuth2 账号认证
 - ✅ WebSocket 实时状态同步
-- ✅ 空调设备控制
-  - 开关机
-  - 模式切换（制冷/制热/除湿/送风/自动）
-  - 温度调节
-  - 风速控制
-  - 室内温度显示
-- ✅ 支持3种空调类型
-  - 分体空调 (02)
-  - 柜机空调 (03)
-  - 商用空调 (0d)
+- ✅ 空调设备控制（`climate` 平台）
+  - 开关机（始终可用）
+  - 模式切换（制冷 / 制热 / 除湿 / 送风 / 自动）
+  - 温度调节（设备的 `targetTemperature` 可写时启用）
+  - 风速控制（设备的 `windSpeed` 可写时启用）
+  - 室内温度显示（`indoorTemperature`）
+- ✅ 场景同步（`scene` 平台）：海尔云端手动场景以 HA 场景实体呈现
+- ✅ 多语言配置向导（简体中文 / English）
+
+> 实际暴露的 HVAC 模式取决于设备上报的 `operationMode` 枚举与集成映射表
+> （`climate.py` 的 `MODE_NAME_MAP`）的交集，`OFF` 始终存在。
 
 ## 安装方式
 
@@ -65,17 +66,24 @@ git clone https://github.com/haier-ha/ha_haier_home.git haier_home
   → 英文。
 
 > 维护提示：选语言之后页面的文案以 `haier/i18n/<lang>.json` 为准（由
-> `haier/flow_i18n.py` 的 `translate()` 加载）；`strings.json` 与
-> `translations/*.json` 中对应字段使用 `{占位符}`。详见
+> `haier/flow_i18n.py` 的 `translate()` 加载）；`translations/*.json` 中对应字段使用
+> `{占位符}`，运行时通过 `description_placeholders` 与显式 selector label 注入。详见
 > `docs/config_flow_language_option_design.md`。
 
 ## 支持的设备
 
-| 设备类型码 | 设备名称 | 说明 |
-|-----------|---------|------|
-| 02 | 分体空调 | 标准家用空调 |
-| 03 | 柜机空调 | 大功率空调 |
-| 0d | 商用空调 | 部分型号不支持室内温度 |
+集成通过海尔 `appTypeCode` 判定设备是否受支持：命中下表则识别为空调（内部类型
+`AC`）并创建 `climate` 实体，未命中的设备会被跳过。映射定义见 `const.py` 的
+`DEVICE_TYPE_MAP`。
+
+| appTypeCode | 内部类型 |
+|-------------|---------|
+| `A177` | AC（空调） |
+| `A178` | AC（空调） |
+| `A120` | AC（空调） |
+
+> 设备的具体能力（可用模式、是否支持风速/温度调节、是否上报室内温度）由该设备的
+> `digital model` 属性动态决定，而非按机型硬编码。
 
 ## 技术架构
 
@@ -105,6 +113,7 @@ custom_components/
     │   └── zh-Hans.json
     └── haier/                      # 海尔 API 客户端包
         ├── __init__.py
+        ├── command_debouncer.py    # 命令去抖（合并短时间内的重复下发）
         ├── coordinator.py          # 数据协调器：状态同步 + WebSocket 生命周期
         ├── flow_i18n.py            # 配置流语言文案 translate() 加载器
         ├── http_client.py          # REST API 客户端
@@ -114,7 +123,7 @@ custom_components/
         ├── websocket_client.py     # WebSocket 客户端（实时状态/命令下发）
         └── i18n/                   # 配置流语言文案表
             ├── en.json
-            └── zh.json
+            └── zh-Hans.json
 
 ```
 
@@ -127,11 +136,14 @@ custom_components/
   （数值上下限/步长、枚举选项、布尔读写）。
 - **Level 2 平台基类**（如 `climate.py` 的 `HaierClimateEntity`）：混入 HA 平台基类，
   提供该平台默认实现。
-- **Level 3 PID 扩展**（`extend/*.py`）：按具体 PID 覆写差异，用
-  `@HaierDeviceEntity.register(...)` 自注册。
+- **Level 3 PID 扩展**（`extend/*.py`）：按 PID 覆写差异，用
+  `@HaierDeviceEntity.register(pid, platform)` 自注册。`pid` 传**单个字符串**时注册到
+  *specific* 注册表，传**字符串列表**时为其中每个 PID 注册到 *generic* 注册表；平台级
+  兜底用 `@HaierDeviceEntity.register_platform(platform)`（`HaierClimateEntity` 即以此
+  注册为 climate 平台的默认类）。
 
 平台入口通过 `HaierDeviceEntity.create()` 按 `(PID, 平台)` 自动选择正确的类，
-查找优先级为 specific → generic → platform → 基类。
+查找优先级为 specific → generic → platform → 基类（`HaierDeviceEntity` 自身）。
 
 ## 开发指南
 
@@ -146,9 +158,11 @@ from ..climate import HaierClimateEntity
 from ..entity import HaierDeviceEntity
 
 
-@HaierDeviceEntity.register(["pid_x"], "climate")
-class PidXClimateEntity(HaierClimateEntity):
-    """仅覆写与默认不同的部分。"""
+# 一个字符串列表会为其中每个 PID 注册到 generic 注册表；
+# 只覆写单个 PID 时可直接传字符串（注册到 specific 注册表）。
+@HaierDeviceEntity.register(["pid_common_a", "pid_common_b"], "climate")
+class CommonABClimateEntity(HaierClimateEntity):
+    """仅覆写与默认不同的部分（这里是 operationMode 映射）。"""
 
     # 注意：键必须是字符串——查表通过 MODE_NAME_MAP.get(str(v)) 进行，
     # 整数键将永远匹配不到，覆写会静默失效。
@@ -156,8 +170,13 @@ class PidXClimateEntity(HaierClimateEntity):
         "0": "auto",
         "1": "cool",
         "2": "heat",
+        "3": "dry",
+        "6": "fan_only",
     }
 ```
+
+> 上例取自 `extend/common_ab.py`。默认映射见 `climate.py` 的 `MODE_NAME_MAP`
+> （`0→auto, 1→cool, 2→dry, 4→heat, 6→fan_only`）。
 
 若某 PID 与平台默认行为完全一致，则无需创建任何扩展文件。
 
