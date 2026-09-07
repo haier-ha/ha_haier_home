@@ -1,6 +1,6 @@
 {
     "domain": "haier_home",
-    "name": "Haier Home",
+    "name": "Haier Smart Home",
     "codeowners": ["@haier-ha"],
     "config_flow": true,
     "dependencies": [],

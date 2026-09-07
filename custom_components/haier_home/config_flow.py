@@ -373,7 +373,7 @@ class HaierHomeConfigFlow(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, do
         await self.async_set_unique_id(entry_uuid)
         self._abort_if_unique_id_configured()
         return self.async_create_entry(
-            title="Haier Home",
+            title="Haier Smart Home",
             data={
                 "region": self._region,
                 "token": self._token,

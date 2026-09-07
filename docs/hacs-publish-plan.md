@@ -51,7 +51,7 @@ HACS 有两种让用户用到集成的方式，请先明确你的目标：
 
 ### 📌 需你确认的一致性问题
 
-- `manifest.json` 里 `"name": "Haier Home"`，而 `hacs.json` / `README` / `info.md` 用的是 `"Haier Smart Home"`。两者不影响校验通过，但商店显示名以 `hacs.json` 的 `name` 为准。若希望统一，建议把 `manifest.json` 的 `name` 也改为 `Haier Smart Home`。
+- ✅ 已统一显示名为 `Haier Smart Home`：`manifest.json` 的 `name`、config flow 的入口标题、config flow `user` 步骤的 en 标题/描述均已与 `hacs.json` / `README` / `info.md` 保持一致（中文 UI 沿用「海尔智家」）。
 
 ---
 
