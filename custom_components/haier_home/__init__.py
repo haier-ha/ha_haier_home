@@ -19,6 +19,7 @@ from homeassistant.config_entries import (
 from homeassistant.core import Event, HomeAssistant
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import config_entry_oauth2_flow
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 
 from .const import APP_ID, DEFAULT_LANGUAGE, DEFAULT_REGION, DOMAIN, EVENT_SEND_COMMAND, PLATFORMS
@@ -30,6 +31,12 @@ from .haier.storage import HaierDeviceCache
 from .haier.utils import validate_entry_data
 
 _LOGGER = logging.getLogger(__name__)
+
+# This integration is configured exclusively through the UI config flow, so it
+# has no YAML configuration schema. Declaring config_entry_only satisfies the
+# HA requirement that any integration implementing async_setup defines one of
+# CONFIG_SCHEMA / PLATFORM_SCHEMA / PLATFORM_SCHEMA_BASE.
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 async def _handle_send_command(event: Event, hass: HomeAssistant) -> None:

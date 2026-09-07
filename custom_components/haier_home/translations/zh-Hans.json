@@ -11,7 +11,7 @@
                 "data": {
                     "eula_accepted": "我已悉知以上全部风险条款，并自愿承担因使用此集成所产生的一切相关风险与责任。"
                 },
-                "submit_button": "下一步"
+                "submit": "下一步"
             },
             "region": {
                 "title": "区域与语言",
@@ -20,7 +20,7 @@
                     "region": "区域",
                     "language": "语言"
                 },
-                "submit_button": "下一步"
+                "submit": "下一步"
             },
             "oauth": {
                 "title": "{oauth_title}",
@@ -34,7 +34,7 @@
                     "room_sync_mode": "{room_sync_label}",
                     "scene_sync": "{scene_sync_label}"
                 },
-                "submit_button": "提交"
+                "submit": "提交"
             }
         },
         "error": {

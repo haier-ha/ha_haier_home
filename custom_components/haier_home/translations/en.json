@@ -11,7 +11,7 @@
                 "data": {
                     "eula_accepted": "I acknowledge all of the above risk terms and voluntarily assume all related risks and responsibilities arising from the use of this integration."
                 },
-                "submit_button": "Next"
+                "submit": "Next"
             },
             "region": {
                 "title": "Region & Language",
@@ -20,7 +20,7 @@
                     "region": "Region",
                     "language": "Language"
                 },
-                "submit_button": "Next"
+                "submit": "Next"
             },
             "oauth": {
                 "title": "{oauth_title}",
@@ -34,7 +34,7 @@
                     "room_sync_mode": "{room_sync_label}",
                     "scene_sync": "{scene_sync_label}"
                 },
-                "submit_button": "Submit"
+                "submit": "Submit"
             }
         },
         "error": {

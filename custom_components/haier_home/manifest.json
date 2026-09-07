@@ -1,13 +1,13 @@
 {
     "domain": "haier_home",
     "name": "Haier Home",
-    "version": "1.0.0",
-    "documentation": "https://github.com/haier-ha/ha_haier_home",
-    "issue_tracker": "https://github.com/haier-ha/ha_haier_home/issues",
+    "codeowners": ["@haier-ha"],
     "config_flow": true,
+    "dependencies": [],
+    "documentation": "https://github.com/haier-ha/ha_haier_home",
     "integration_type": "hub",
     "iot_class": "cloud_push",
+    "issue_tracker": "https://github.com/haier-ha/ha_haier_home/issues",
     "requirements": [],
-    "dependencies": [],
-    "codeowners": ["@haier-ha"]
+    "version": "1.0.0"
 }
