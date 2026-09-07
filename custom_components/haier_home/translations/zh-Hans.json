@@ -15,7 +15,7 @@
             },
             "region": {
                 "title": "区域与语言",
-                "description": "**选择您的云服务器区域和首选语言**\n\n认证跳转地址为 **`http://homeassistant.local:8123`** ，Home Assistant 需要与当前操作终端（例如，个人电脑）在同一局域网内，且操作终端能通过该地址访问 Home Assistant 首页，否则登录认证可能会失败。\n\n**注意事项**\n- 对于数百个及以上海尔设备的用户，首次添加集成会耗费一些时间，请耐心等待。\n- 如果 Home Assistant 运行在 docker 环境下，请确保 docker 网络模式为 host，否则会导致本地控制功能异常。",
+                "description": "**选择您的云服务器区域和首选语言**\n\n认证跳转地址为 **`{redirect_url}`** ，Home Assistant 需要与当前操作终端（例如，个人电脑）在同一局域网内，且操作终端能通过该地址访问 Home Assistant 首页，否则登录认证可能会失败。\n\n**注意事项**\n- 对于数百个及以上海尔设备的用户，首次添加集成会耗费一些时间，请耐心等待。\n- 如果 Home Assistant 运行在 docker 环境下，请确保 docker 网络模式为 host，否则会导致本地控制功能异常。",
                 "data": {
                     "region": "区域",
                     "language": "语言"

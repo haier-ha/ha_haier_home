@@ -15,7 +15,7 @@
             },
             "region": {
                 "title": "Region & Language",
-                "description": "**Select your cloud server region and preferred language**\n\nThe authentication redirect URL is **`http://homeassistant.local:8123`** . Home Assistant must be on the same local network as the terminal you are currently using (e.g. your personal computer), and that terminal must be able to access the Home Assistant home page via this URL; otherwise the login authentication may fail.\n\n**Notes**\n- For users with hundreds or more Haier devices, the first-time integration setup may take a while. Please be patient.\n- If Home Assistant runs in a Docker environment, make sure the Docker network mode is set to host; otherwise local control may not work properly.",
+                "description": "**Select your cloud server region and preferred language**\n\nThe authentication redirect URL is **`{redirect_url}`** . Home Assistant must be on the same local network as the terminal you are currently using (e.g. your personal computer), and that terminal must be able to access the Home Assistant home page via this URL; otherwise the login authentication may fail.\n\n**Notes**\n- For users with hundreds or more Haier devices, the first-time integration setup may take a while. Please be patient.\n- If Home Assistant runs in a Docker environment, make sure the Docker network mode is set to host; otherwise local control may not work properly.",
                 "data": {
                     "region": "Region",
                     "language": "Language"

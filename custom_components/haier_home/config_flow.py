@@ -24,6 +24,7 @@ from .const import (
     DEFAULT_REGION,
     DOMAIN,
     LANGUAGE_OPTIONS,
+    REDIRECT_URL,
     REGION_OPTIONS,
     ROOM_SYNC_OPTIONS,
     SCENE_SYNC_OPTIONS,
@@ -180,6 +181,7 @@ class HaierHomeConfigFlow(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, do
                     vol.Required("language", default=DEFAULT_LANGUAGE): vol.In(LANGUAGE_OPTIONS),
                 }
             ),
+            description_placeholders={"redirect_url": REDIRECT_URL},
             last_step=False,
         )
 

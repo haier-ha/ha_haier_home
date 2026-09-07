@@ -26,6 +26,10 @@ LANGUAGE_OPTIONS = {
 OAUTH2_AUTH_URL = "https://account.haier.com/oauth/authorize"
 OAUTH2_TOKEN_URL = "https://account.haier.com/oauth/token"
 OAUTH2_CALLBACK_URL = "http://homeassistant.local:8123/auth/external/callback"
+# Base URL shown to the user in the region step description. Kept out of the
+# translation strings because hassfest forbids literal URLs there; it is
+# injected at runtime via description_placeholders instead.
+REDIRECT_URL = "http://homeassistant.local:8123"
 
 # API hosts mapping by region
 API_HOSTS_MAP = {
