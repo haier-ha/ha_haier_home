@@ -1,373 +1,207 @@
-# HACS 发布准备计划
+# HACS 发布操作手册
 
-> **目标：** 将 haier_home 集成发布到 HACS (Home Assistant Community Store)
+> **目标：** 让用户能在 HACS 中搜索并安装 `haier_home` 集成。
+> **仓库：** `haier-ha/ha_haier_home`（remote: `git@ha:haier-ha/ha_haier_home.git`，默认分支 `main`）
+> **最后核对时间：** 2026-09-07（基于当前代码库实际状态）
 
-## 1. 当前状态评估
+---
 
-### ✅ 已完成项
+## 0. 两种"能被搜到"的路径先说清楚
 
-| 项目 | 状态 | 位置 |
+HACS 有两种让用户用到集成的方式，请先明确你的目标：
+
+| 方式 | 用户操作 | 是否需要审核 | 说明 |
+|-----|---------|------------|-----|
+| **A. 自定义仓库（Custom Repository）** | 用户手动添加你的仓库 URL | 否，立即可用 | 用户在 HACS 里粘贴仓库地址即可安装。**无法通过关键词搜索到。** |
+| **B. 默认商店（Default Store）** | 用户直接搜索 "Haier Smart Home" | 是，需向 `hacs/default` 提 PR 并合并 | 这才是"在 HACS 里搜索到"的唯一方式。 |
+
+**要实现"在 HACS 里搜索到"，必须走方式 B。** 本手册以方式 B 为最终目标，方式 A 作为发布前的自测手段。
+
+---
+
+## 1. 当前状态评估（已实际核对）
+
+### ✅ 已满足项
+
+| 要求 | 状态 | 证据 / 位置 |
 |-----|------|-----|
-| 目录结构符合 HACS 规范 | ✅ | `custom_components/haier_home/` |
-| `manifest.json` 存在 | ✅ | `custom_components/haier_home/manifest.json` |
-| `hacs.json` 已创建 | ✅ | `hacs.json` |
-| `info.md` 已创建 | ✅ | `info.md` |
-| `README.md` 存在 | ✅ | `README.md` |
-| 集成功能开发完成 | ✅ | - |
+| 目录结构：单一集成位于 `custom_components/haier_home/` | ✅ | 仅有 `haier_home` 一个子目录 |
+| `manifest.json` 含全部必需键 | ✅ | `domain` / `name` / `version` / `documentation` / `issue_tracker` / `codeowners` 均已填写，无占位符 |
+| `hacs.json` 含 `name` | ✅ | `"name": "Haier Smart Home"` |
+| `info.md` 有内容 | ✅ | 根目录 `info.md` |
+| `README.md` 存在 | ✅ | 根目录 |
+| `LICENSE.md` 存在 | ✅ | 根目录（MIT） |
+| hassfest 工作流 | ✅ | `.github/workflows/hassfest.yaml`（与官方示例一致：`checkout@v4`） |
+| HACS 验证工作流 | ✅ | `.github/workflows/validate.yml`（已补上缺失的 checkout 步骤，与官方示例一致：`checkout@v3`） |
+| 品牌图标（本地） | ✅ | `custom_components/haier_home/brand/icon.png`、`icon@2x.png` |
 
-### ❌ 待完成项
+### ❌ 待完成项（阻塞"被搜索到"）
 
-| 项目 | 优先级 | 描述 |
+| 项目 | 优先级 | 说明 |
 |-----|-------|-----|
-| `manifest.json` 占位符 | 🔴 高 | `documentation`、`issue_tracker` 和 `codeowners` 使用了占位符 |
-| GitHub Actions 验证工作流 | 🔴 高 | 需要添加 HACS Action 和 hassfest 验证 |
-| GitHub Description | 🟡 中 | 需要在 GitHub 仓库设置中添加描述 |
-| GitHub Topics | 🟡 中 | 需要添加搜索标签 |
-| Home Assistant Brands | 🟡 中 | 需要提交品牌图标到 `home-assistant/brands` |
+| 提交品牌到 `home-assistant/brands` | 🔴 必须 | HACS 默认商店 CI 会检查 `home-assistant/brands` 是否包含 `haier_home`，不通过则 PR 被拒 |
+| GitHub 仓库设置（描述 / Issues / Topics） | 🔴 必须 | 默认商店 CI 检查：必须有 description、启用 Issues、定义 topics |
+| 创建 GitHub Release / Tag | 🟡 推荐 | 非必需，但推荐（HACS 会展示最近 5 个版本供下载） |
+| 向 `hacs/default` 提交 PR | 🔴 必须 | 最终把集成加入默认商店的动作 |
+
+### ⚠️ 已在本次修复
+
+- `.github/workflows/validate.yml` 之前**缺少 `actions/checkout` 步骤**，`hacs/action` 无法拿到仓库内容会失败 —— 已补上。补上后与 [HACS 官方文档](https://www.hacs.dev/docs/publish/action) 示例一致（checkout 版本为 `@v3`）。
+- `.github/workflows/hassfest.yaml` 的 checkout 版本对齐到 [home-assistant/actions 官方仓库](https://github.com/home-assistant/actions) 当前示例（`@v4`）。
+
+### 📌 需你确认的一致性问题
+
+- `manifest.json` 里 `"name": "Haier Home"`，而 `hacs.json` / `README` / `info.md` 用的是 `"Haier Smart Home"`。两者不影响校验通过，但商店显示名以 `hacs.json` 的 `name` 为准。若希望统一，建议把 `manifest.json` 的 `name` 也改为 `Haier Smart Home`。
 
 ---
 
-## 2. 详细变更任务
+## 2. HACS 默认商店的准入要求（官方，2026-09 核对）
 
-### 任务 1：更新 `manifest.json`
+来源：[HACS - Integrations](https://www.hacs.dev/docs/publish/integration) 与 [HACS - Include default repositories](https://www.hacs.dev/docs/publish/include)（内容经改写以符合授权要求）。
 
-**文件：** `custom_components/haier_home/manifest.json`
+**仓库结构与文件：**
+- `custom_components/` 下只能有一个集成子目录。
+- `manifest.json` 必须至少包含：`domain`、`documentation`、`issue_tracker`、`codeowners`、`name`、`version`。
+- `hacs.json` 至少要有 `name`。
+- 必须存在有内容的 `info.md`（或按配置的 README）。
 
-**HACS 要求的必需字段：**
-- `domain` — 集成域名
-- `name` — 显示名称
-- `version` — 版本号
-- `documentation` — 文档 URL
-- `issue_tracker` — Issue 追踪 URL
-- `codeowners` — 维护者列表
+**集成专属：**
+- 集成必须已加入 `home-assistant/brands`。
+- 必须同时通过 `home-assistant/actions` 的 hassfest 与 `hacs/action` 两个校验。
 
-**当前问题：**
-- `documentation`: `"https://github.com/your-github-username/ha_haier_home"` — 需要替换为实际用户名
-- `issue_tracker`: `"https://github.com/your-github-username/ha_haier_home/issues"` — 需要替换为实际用户名
-- `codeowners`: `["@your-github-username"]` — 需要替换为实际用户名
+**仓库层面（默认商店 CI 会检查）：**
+- 仓库有描述（description）。
+- 已启用 Issues。
+- 已定义 Topics。
+- 仓库未被归档。
+- 提交 PR 的人必须是仓库 owner 或主要贡献者。
 
-**最终内容：**
+**PR 相关限制：**
+- 从个人账号 fork `hacs/default`，**不能用组织账号**提交（PR 需可编辑）。
+- 从 `master` 新建分支改动，不要直接改 `master`。
+- 列表**区分大小写**。
+
+---
+
+## 3. 操作步骤（按顺序执行即可）
+
+### 步骤 1 —— （可选）统一显示名
+
+如果希望名称一致，编辑 `custom_components/haier_home/manifest.json`：
+
 ```json
-{
-    "domain": "haier_home",
-    "name": "Haier Home",
-    "version": "0.1.0",
-    "documentation": "https://github.com/<YOUR_GITHUB_USERNAME>/ha_haier_home",
-    "issue_tracker": "https://github.com/<YOUR_GITHUB_USERNAME>/ha_haier_home/issues",
-    "config_flow": true,
-    "integration_type": "hub",
-    "iot_class": "cloud_push",
-    "requirements": [],
-    "dependencies": [],
-    "codeowners": ["@<YOUR_GITHUB_USERNAME>"]
-}
+"name": "Haier Smart Home",
 ```
 
-**注意：**
-- 将 `<YOUR_GITHUB_USERNAME>` 替换为实际的 GitHub 用户名
-- `codeowners` 数组中必须包含至少一个 GitHub ID（格式：`@username`）
+### 步骤 2 —— 提交品牌图标到 home-assistant/brands（必须）
 
----
+1. Fork [home-assistant/brands](https://github.com/home-assistant/brands)。
+2. 新建目录 `custom_integrations/haier_home/`，放入：
+   - `icon.png`（256×256，可直接用仓库里 `custom_components/haier_home/brand/icon.png`）
+   - `icon@2x.png`（512×512，用 `brand/icon@2x.png`）
+   - 如有 logo 再加 `logo.png` / `logo@2x.png`（非必需）
+3. 提交 PR，等待合并。
 
-### 任务 2：创建 HACS GitHub Action 验证工作流
+> 说明：这一步的合并可能需要几天。可以先并行推进步骤 3–5，但**默认商店 PR（步骤 6）必须在 brands 合并后才会通过 CI**。
 
-**文件：** `.github/workflows/hacs.yml`
+### 步骤 3 —— 配置 GitHub 仓库设置（必须）
 
-**用途：** HACS 官方提供的 GitHub Action，使用与 HACS 相同的代码验证仓库，确保集成在 HACS 中有效。
+在 `https://github.com/haier-ha/ha_haier_home` 页面：
 
-**触发时机：**
-- Push 时自动验证
-- Pull Request 时自动验证
-- 每天午夜定时验证（检查 HACS 更新后是否仍然兼容）
-- 手动触发（workflow_dispatch）
+1. **Description**（About → 齿轮图标）填写，例如：
+   ```
+   Haier Smart Home integration for Home Assistant - 海尔智能家居 Home Assistant 集成
+   ```
+2. **Topics** 添加（用于 HACS 搜索）：
+   ```
+   home-assistant  hacs  haier  smart-home  iot  climate  oauth2
+   ```
+3. 确认 **Settings → General → Features → Issues** 已勾选启用。
+4. 确认仓库**未归档**。
 
-**内容：**
-```yaml
-name: HACS Validation
+### 步骤 4 —— 推送代码，确保两个 Action 通过（必须）
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-  schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
-
-jobs:
-  validate-hacs:
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: "actions/checkout@v4"
-      - name: HACS validation
-        uses: "hacs/action@main"
-        with:
-          category: "integration"
-```
-
-**说明：**
-- `category` 必须设置为 `integration`（集成类型）
-- 此 Action 使用与 HACS 完全相同的验证逻辑
-- 每日定时检查可以确保 HACS 更新后集成仍然有效
-
----
-
-### 任务 3：创建 hassfest 验证工作流
-
-**文件：** `.github/workflows/hassfest.yml`
-
-**用途：** Home Assistant 官方的集成验证工具，检查集成是否符合 Home Assistant 的规范要求。
-
-**触发时机：**
-- Push 时自动验证
-- Pull Request 时自动验证
-- 每天午夜定时验证（检查 HA 更新后是否仍然兼容）
-
-**内容：**
-```yaml
-name: Hassfest Validation
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-  schedule:
-    - cron: "0 0 * * *"
-  workflow_dispatch:
-
-jobs:
-  validate-hassfest:
-    runs-on: "ubuntu-latest"
-    steps:
-      - uses: "actions/checkout@v4"
-      - name: Hassfest validation
-        uses: "home-assistant/actions/hassfest@master"
-```
-
-**说明：**
-- hassfest 会跟踪 Home Assistant 的 beta 版本通道
-- 如果集成与新版本 Home Assistant 不兼容，会收到通知
-- 这是 HACS 推荐的验证方式
-
----
-
-### 任务 4：更新 GitHub 仓库设置
-
-这些设置需要在 GitHub 仓库页面手动完成：
-
-#### 4.1 添加仓库描述 (Description)
-在 GitHub 仓库 **Settings → General** 中，添加简短描述：
-```
-Haier Smart Home integration for Home Assistant - 海尔智能家居 Home Assistant 集成
-```
-
-**说明：** HACS 会使用这个描述展示在商店中。
-
-#### 4.2 添加 Topics（搜索标签）
-在 GitHub 仓库 **Settings → General** 中，添加以下 topics：
-```
-home-assistant, hacs, haier, smart-home, iot, climate, oauth2
-```
-
-**说明：** Topics 不会显示在 HACS UI 中，但用于 HACS 商店的搜索功能。
-
-#### 4.3 启用 GitHub Releases
-在 GitHub 仓库页面创建 Tag 和 Release：
 ```bash
-# 创建 tag 并推送
-git tag -a v0.1.0 -m "Release v0.1.0"
-git push origin v0.1.0
-
-# 使用 GitHub CLI 创建 Release
-gh release create v0.1.0 \
-  --title "Haier Home v0.1.0" \
-  --notes $'## What\'s New\n\n- Initial release\n- Support for Haier air conditioners\n- OAuth2 authentication\n- WebSocket real-time sync'
-```
-
-**说明：**
-- HACS 会展示最近 5 个版本供用户选择下载
-- 如果不使用 releases，HACS 会使用默认分支的文件
-
----
-
-### 任务 5：Home Assistant Brands 提交
-
-**要求：** HACS 要求集成必须在 [home-assistant/brands](https://github.com/home-assistant/brands) 仓库中有品牌定义。
-
-**步骤：**
-1. Fork `home-assistant/brands` 仓库
-2. 在 `custom_integrations/haier_home/` 目录下添加：
-   - `icon.png` — 品牌图标（建议 256x256 像素）
-   - `icon@2x.png` — 高分辨率图标（建议 512x512 像素）
-   - `brand.json` — 品牌元信息
-
-3. `brand.json` 示例：
-```json
-{
-    "name": "Haier Smart Home",
-    "domain": "haier_home",
-    "issue_tracker": "https://github.com/<YOUR_GITHUB_USERNAME>/ha_haier_home/issues"
-}
-```
-
-4. 提交 PR 到 `home-assistant/brands` 仓库
-
-**注意：**
-- 这一步可以在发布 HACS 后进行
-- 在 Brands 合并前，HACS 会使用集成目录中的图标作为降级显示
-
----
-
-## 3. 验证检查清单
-
-在提交到 HACS 之前，使用以下清单验证：
-
-### 3.1 文件结构验证
-```
-ha_haier_home/
-├── .github/
-│   └── workflows/
-│       ├── hacs.yml             ✅ 新增：HACS 验证
-│       └── hassfest.yml         ✅ 新增：hassfest 验证
-├── hacs.json                    ✅ 已存在
-├── info.md                      ✅ 已存在
-├── README.md                    ✅ 已存在
-├── LICENSE.md                   ✅ 已存在
-└── custom_components/
-    └── haier_home/
-        ├── manifest.json        ✅ 更新
-        ├── __init__.py          ✅ 已存在
-        ├── climate.py           ✅ 已存在
-        ├── config_flow.py       ✅ 已存在
-        ├── const.py             ✅ 已存在
-        ├── device.py            ✅ 已存在
-        ├── entity.py            ✅ 已存在
-        └── ...
-```
-
-### 3.2 manifest.json 验证
-- [ ] `domain` 字段设置正确：`haier_home`
-- [ ] `name` 字段设置正确：`Haier Home`
-- [ ] `version` 字段格式正确：`0.1.0`
-- [ ] `documentation` URL 有效且可达
-- [ ] `issue_tracker` URL 有效且可达
-- [ ] `codeowners` 包含至少一个维护者（格式：`@username`）
-
-### 3.3 hacs.json 验证
-- [ ] `name` 字段设置正确
-- [ ] `homeassistant` 版本格式正确（使用 AwesomeVersion，如 `2024.1.0`）
-- [ ] 所有必需字段已填写
-
-### 3.4 GitHub Actions 验证
-- [ ] HACS Action 工作流已创建：`.github/workflows/hacs.yml`
-- [ ] hassfest 工作流已创建：`.github/workflows/hassfest.yml`
-- [ ] HACS Action 中 `category` 设置为 `integration`
-- [ ] 推送到 GitHub 后 Actions 能正常运行
-
-### 3.5 功能验证
-- [ ] 集成可以正常加载
-- [ ] OAuth2 认证流程正常
-- [ ] 设备发现和控制正常
-- [ ] 没有错误日志输出
-
----
-
-## 4. 发布到 HACS 的步骤
-
-完成以上所有变更后，按照以下步骤发布：
-
-### 4.1 推送到 GitHub
-```bash
-git add .
-git commit -m "feat: prepare for HACS release"
+git add .github/workflows/validate.yml .github/workflows/hassfest.yaml custom_components/haier_home/manifest.json docs/hacs-publish-plan.md
+git commit -m "chore: fix HACS/hassfest workflows and update publish plan"
 git push origin main
 ```
 
-### 4.2 等待 GitHub Actions 验证通过
-```bash
-# 查看 Actions 状态
-gh workflow run "HACS Validation"
-gh workflow run "Hassfest Validation"
+在 GitHub **Actions** 页查看，或用 CLI：
 
-# 查看运行结果
-gh run list --workflow="HACS Validation"
-gh run list --workflow="Hassfest Validation"
+```bash
+gh run list --workflow=validate.yml
+gh run list --workflow=hassfest.yaml
 ```
 
-**确保两个验证都通过后再继续。**
+**两个都必须是绿色（success）再继续。** 如果红色，点进日志按提示修复。
 
-### 4.3 创建 Release
+### 步骤 5 —— 创建 Release（推荐，非必须）
+
 ```bash
-# 使用 GitHub CLI 创建 release
-gh release create v0.1.0 \
-  --title "Haier Home v0.1.0" \
-  --notes $'## What\'s New\n\n- Initial release\n- Support for Haier air conditioners\n- OAuth2 authentication\n- WebSocket real-time sync'
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+
+gh release create v1.0.0 \
+  --title "Haier Smart Home v1.0.0" \
+  --notes $'## 首个正式版本\n\n- 海尔空调设备控制（分体/柜机/商用）\n- OAuth2 账号认证\n- WebSocket 实时状态同步\n- 场景控制'
 ```
 
-### 4.4 添加到 HACS 测试
-1. 在 Home Assistant 中打开 HACS
-2. 进入 **Settings** → **Custom repositories**
-3. 添加你的仓库 URL：`https://github.com/<YOUR_GITHUB_USERNAME>/ha_haier_home`
-4. 选择 **Integration** 作为类别
-5. 检查集成是否正确显示
+> `manifest.json` 当前 `version` 为 `1.0.0`，tag 建议与之一致（`v1.0.0`）。
 
-### 4.5 提交到 HACS Store（可选）
-如果希望提交到 HACS 默认商店：
-1. 访问 [HACS 提交页面](https://github.com/hacs/integration/issues/new?assignees=&labels=add+repository&template=add-repository.md&title=Add+new+repository)
-2. 填写仓库信息
-3. 等待审核（通常需要几周时间）
+### 步骤 6 —— 发布前自测：以自定义仓库方式安装（强烈建议）
+
+在提交默认商店 PR 之前，先用方式 A 验证真实可安装：
+
+1. Home Assistant 里打开 HACS。
+2. 右上角菜单 → **Custom repositories**。
+3. Repository 填 `https://github.com/haier-ha/ha_haier_home`，Category 选 **Integration**，点 Add。
+4. 回到 HACS 列表，应能看到并下载安装，重启后能在集成里正常配置。
+
+确认无误后，进入最后一步。
+
+### 步骤 7 —— 提交到 HACS 默认商店（这一步才让用户能"搜索到"）
+
+1. **用你的个人 GitHub 账号**（不是 `haier-ha` 组织账号）Fork [hacs/default](https://github.com/hacs/default)。
+2. 从 `master` 新建分支（例如 `add-haier-home`）。
+3. 编辑仓库里的 `integration` 文件，把你的仓库 slug 按**字母顺序、正确大小写**加入：
+   ```
+   haier-ha/ha_haier_home
+   ```
+4. 提交 PR 到 `hacs/default`（PR 来自个人 fork，保持"允许维护者编辑"）。
+5. 等待 CI 全绿 + 维护者合并。合并后，在下一次定时扫描后，用户即可在 HACS 中**搜索到** "Haier Smart Home"。
+
+> HACS 仓库量很大，合并前请先查 backlog，不要频繁催促。
 
 ---
 
-## 5. 建议的后续优化
+## 4. 提交前最终检查清单
 
-### 5.1 添加 Python 测试 CI
-建议添加专门的 Python 测试工作流：
-```yaml
-# .github/workflows/tests.yml
-name: Tests
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.12']
-    
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -r requirements_dev.txt
-      - run: pytest tests/ -v --tb=short
-      - run: ruff check custom_components/
-```
-
-### 5.2 完善测试覆盖率
-确保核心功能测试覆盖率 > 80%，HACS 用户会关注代码质量。
-
-### 5.3 添加截图
-在 `info.md` 或 `README.md` 中添加集成使用截图，可以在 HACS 商店页面更好地展示。
-
-### 5.4 完善文档
-- 添加 FAQ 章节
-- 添加故障排除指南
-- 添加贡献指南（CONTRIBUTING.md）
+- [ ] `manifest.json` 六个必需键无占位符（✅ 当前已满足）
+- [ ] `hacs.json` 含 `name`（✅ 当前已满足）
+- [ ] `info.md` 有实际内容（✅ 当前已满足）
+- [ ] `custom_components/` 下只有 `haier_home` 一个目录（✅ 当前已满足）
+- [ ] `home-assistant/brands` 已包含 `haier_home`（⬜ 步骤 2）
+- [ ] GitHub 仓库有 description（⬜ 步骤 3）
+- [ ] GitHub Issues 已启用（⬜ 步骤 3）
+- [ ] GitHub Topics 已定义（⬜ 步骤 3）
+- [ ] `validate.yml`（HACS）Action 通过（⬜ 步骤 4）
+- [ ] `hassfest.yaml` Action 通过（⬜ 步骤 4）
+- [ ] 已用自定义仓库方式自测安装成功（⬜ 步骤 6）
+- [ ] 已从**个人 fork** 向 `hacs/default` 提交 PR（⬜ 步骤 7）
 
 ---
 
-## 参考链接
+## 5. 参考链接
 
-- [HACS 发布指南 - General](https://www.hacs.dev/docs/publish/start/)
-- [HACS 发布指南 - Integration](https://www.hacs.dev/docs/publish/integration/)
-- [HACS GitHub Action](https://www.hacs.dev/docs/publish/action/)
-- [hassfest 介绍](https://developers.home-assistant.io/blog/2020/04/16/hassfest)
-- [Home Assistant Brands](https://github.com/home-assistant/brands)
-- [AwesomeVersion 版本检查](https://ludeeus.github.io/awesomeversion)
-- [HACS Action 仓库](https://github.com/hacs/action)
-- [Home Assistant Actions](https://github.com/home-assistant/actions)
+- [HACS - Integrations](https://www.hacs.dev/docs/publish/integration)
+- [HACS - Include default repositories](https://www.hacs.dev/docs/publish/include)
+- [HACS Action](https://github.com/hacs/action)
+- [home-assistant/actions (hassfest)](https://github.com/home-assistant/actions)
+- [home-assistant/brands](https://github.com/home-assistant/brands)
+- [hacs/default](https://github.com/hacs/default)
+- [Home Assistant 集成 manifest 文档](https://developers.home-assistant.io/docs/creating_integration_manifest)
+
+---
+
+*内容已根据授权要求改写。*
