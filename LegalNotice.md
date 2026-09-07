@@ -16,12 +16,12 @@ Services）、海尔云接口（Haier Cloud APIs）和相关在线服务。
 ## 1. 开源代码许可
 
 本仓库中由海尔提供并有权许可的 Haier Home Integration 源代码，按照
-**Apache License, Version 2.0** 授权，具体以本仓库的 **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)**
+**Apache License, Version 2.0** 授权，具体以本仓库的 **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)**
 为准。
 
 Apache License 2.0
 对相关源代码授予的权利，包括在符合许可证条款的前提下使用、复制、修改和分发代码。任何有关本集成源代码的许可范围，均以
-[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md) 为准。
+[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE) 为准。
 
 本法律声明不对 Apache License 2.0 已授予的源代码权利施加额外限制。
 
@@ -82,14 +82,14 @@ Haier Home Integration
 
 为避免疑义：
 
--   **Integration 源代码许可**：以 [LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)（Apache License
+-   **Integration 源代码许可**：以 [LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)（Apache License
     2.0）为准；
 -   **Haier Cloud Services / Haier Cloud
     APIs**：以海尔适用的服务协议、API/开发者条款及授权规则为准；
 -   **海尔商标、Logo 和品牌标识**：不因源代码开源而获得授权；
 -   **用户账号、个人信息和服务数据处理**：以适用的用户协议、隐私政策及法律法规为准。
 
-本法律声明不应被解释为限制 [LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md) 已明确授予的任何源代码许可权利。
+本法律声明不应被解释为限制 [LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE) 已明确授予的任何源代码许可权利。
 
 ------------------------------------------------------------------------
 
@@ -105,11 +105,11 @@ online services with which the integration connects or interacts.
 
 Source code of the Haier Home Integration that is provided by Haier and
 that Haier is entitled to license is made available under the **Apache
-License, Version 2.0**, as set forth in **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)**.
+License, Version 2.0**, as set forth in **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)**.
 
 Rights relating to the source code, including rights to use, reproduce,
 modify, and distribute it subject to the applicable license conditions,
-are governed by [LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md).
+are governed by [LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE).
 
 Nothing in this Legal Notice is intended to impose additional
 restrictions on source-code rights granted under the Apache License 2.0.
@@ -190,7 +190,7 @@ availability, or maintenance.
 
 For clarity:
 
--   **Integration source code** is governed by [LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md) (Apache
+-   **Integration source code** is governed by [LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE) (Apache
     License 2.0);
 -   **Haier Cloud Services / Haier Cloud APIs** are governed by
     applicable Haier service agreements, API/developer terms, and
@@ -202,4 +202,4 @@ For clarity:
     laws.
 
 Nothing in this Legal Notice is intended to limit any source-code rights
-expressly granted by [LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md).
+expressly granted by [LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE).

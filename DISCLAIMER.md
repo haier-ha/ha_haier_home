@@ -29,7 +29,7 @@ Assistant 环境中处理或存储相关信息，包括但不限于：
 
 ## 2. 开源代码与社区版本
 
-Haier Home Integration 源代码按照 **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)** 所载 Apache License 2.0 提供。
+Haier Home Integration 源代码按照 **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)** 所载 Apache License 2.0 提供。
 
 本项目可接受社区贡献。社区维护版本、Fork 版本、修改版本、第三方发行版本及非官方构建版本由其各自维护者负责，不因包含或衍生自 Haier Home Integration 代码而成为海尔官方版本。
 
@@ -49,7 +49,7 @@ Haier Home Integration 源代码按照 **[LICENSE.md](https://github.com/haier-h
 
 ## 4. 源代码与云服务的适用规则
 
-Haier Home Integration **源代码** 的使用、复制、修改和分发以 **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)**（Apache License 2.0）为准。本免责声明不对 Apache License 2.0 已授予的代码权利增加额外的用途限制。
+Haier Home Integration **源代码** 的使用、复制、修改和分发以 **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)**（Apache License 2.0）为准。本免责声明不对 Apache License 2.0 已授予的代码权利增加额外的用途限制。
 
 **Haier Cloud Services、Haier Cloud APIs 及其他在线服务不属于 Apache License 2.0 的授权范围。**
 
@@ -99,7 +99,7 @@ Home Assistant、第三方组件、海尔云服务或 API 的升级、调整或�
 您应自行确保对本集成及相关服务的使用符合：
 
 -   所在地适用法律法规；
--   **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)** ；
+-   **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)** ；
 -   Home Assistant 适用的规则和条款；
 -   海尔适用的用户协议、隐私政策、API/开发者条款和其他服务协议；
 -   相关第三方软件或服务的适用条款。
@@ -131,7 +131,7 @@ Haier does not control or guarantee the security of a Home Assistant installatio
 ## 2. Open-Source Code and Community Versions
 
 The Haier Home Integration source code is provided under the Apache
-License 2.0 as set forth in **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)**.
+License 2.0 as set forth in **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)**.
 
 This project may accept community contributions. Community-maintained versions, forks, modified versions, third-party distributions, and unofficial builds are the responsibility of their respective maintainers and do not become official Haier releases merely because they contain or are derived from Haier Home Integration code.
 
@@ -151,7 +151,7 @@ You are responsible, as appropriate to your deployment environment, for:
 
 ## 4. Rules Applicable to Source Code and Cloud Services
 
-Use, reproduction, modification, and distribution of the Haier Home Integration **source code** are governed by **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)** (Apache License 2.0). This Disclaimer does not impose additional purpose-of-use restrictions on rights granted by the Apache License 2.0.
+Use, reproduction, modification, and distribution of the Haier Home Integration **source code** are governed by **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)** (Apache License 2.0). This Disclaimer does not impose additional purpose-of-use restrictions on rights granted by the Apache License 2.0.
 
 **Haier Cloud Services, Haier Cloud APIs, and other online services are outside the scope of the Apache License 2.0.**
 
@@ -202,7 +202,7 @@ Nothing in this Disclaimer excludes or limits liability that cannot lawfully be 
 You are responsible for ensuring that your use of the integration and related services complies with:
 
 -   applicable laws and regulations;
--   **[LICENSE.md](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE.md)** ;
+-   **[LICENSE](https://github.com/haier-ha/ha_haier_home/blob/main/LICENSE)** ;
 -   applicable Home Assistant rules and terms;
 -   applicable Haier user agreements, privacy policies, API/developer terms, and other service agreements;
 -   applicable terms governing relevant third-party software or services.

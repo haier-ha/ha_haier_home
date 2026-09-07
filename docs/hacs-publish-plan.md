@@ -30,9 +30,9 @@ HACS 有两种让用户用到集成的方式，请先明确你的目标：
 | `hacs.json` 含 `name` | ✅ | `"name": "Haier Smart Home"` |
 | `info.md` 有内容 | ✅ | 根目录 `info.md` |
 | `README.md` 存在 | ✅ | 根目录 |
-| `LICENSE.md` 存在 | ✅ | 根目录（MIT） |
-| hassfest 工作流 | ✅ | `.github/workflows/hassfest.yaml`（与官方示例一致：`checkout@v4`） |
-| HACS 验证工作流 | ✅ | `.github/workflows/validate.yml`（已补上缺失的 checkout 步骤，与官方示例一致：`checkout@v3`） |
+| `LICENSE` 存在 | ✅ | 根目录（Apache License 2.0，标准全文，GitHub 可识别） |
+| hassfest 工作流 | ✅ | `.github/workflows/hassfest.yaml`（`checkout@v5`） |
+| HACS 验证工作流 | ✅ | `.github/workflows/validate.yml`（`checkout@v5`） |
 | 品牌图标（本地） | ✅ | `custom_components/haier_home/brand/icon.png`、`icon@2x.png` |
 
 ### ❌ 待完成项（阻塞"被搜索到"）
