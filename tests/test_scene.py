@@ -13,10 +13,12 @@ stateless entities and are not backed by a virtual device.
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import cast
 from unittest.mock import AsyncMock
 
 import pytest
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.haier_home.const import DOMAIN
@@ -198,7 +200,7 @@ class TestSceneSetupFamilyNaming:
         self._patch_er_empty(monkeypatch, scene_mod)
 
         captured: list = []
-        await scene_mod.async_setup_entry(hass, entry, captured.extend)
+        await scene_mod.async_setup_entry(hass, entry, cast(AddEntitiesCallback, captured.extend))
 
         assert len(captured) == 2
         # Scenes stay plain, device-less official Scene entities; the area is
@@ -234,7 +236,7 @@ class TestSceneSetupFamilyNaming:
         self._patch_er_empty(monkeypatch, scene_mod)
 
         captured: list = []
-        await scene_mod.async_setup_entry(hass, entry, captured.extend)
+        await scene_mod.async_setup_entry(hass, entry, cast(AddEntitiesCallback, captured.extend))
 
         assert len(captured) == 1
         assert captured[0].device_info is None

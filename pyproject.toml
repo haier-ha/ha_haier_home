@@ -85,7 +85,6 @@ line-ending = "auto"
 [tool.mypy]
 files = ["custom_components"]
 python_version = "3.14"
-mypy_path = ["custom_components"]
 explicit_package_bases = true
 strict = false
 show_error_codes = true

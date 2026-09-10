@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Collection
 
 import aiohttp
 from homeassistant.config_entries import (
@@ -388,6 +389,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     dev_reg = dr.async_get(hass)
     restored_from_tombstone = _collect_tombstoned_device_ids(dev_reg)
 
+    # Pre-create the target areas *before* forwarding platform setup (which
+    # registers the devices and applies DeviceInfo.suggested_area). Doing it
+    # here lets the area-registry updates settle during the rest of setup
+    # (digital-model fetches, platform forwarding) so that by the time the
+    # frontend "Name and assign" dialog renders, its area collection already
+    # contains these areas. This works around a frontend race where a freshly
+    # created area is flagged "Unknown area selected" next to its correct name:
+    # the picker latches that flag when its value is first set and never
+    # recomputes it once the area list catches up. Creating the areas earlier
+    # shrinks the race window; it does not change final area assignment because
+    # suggested_area/reconcile already resolve areas by name (get-or-create).
+    _async_precreate_areas(hass, devices)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # Remove HA devices (and their entities) for cloud-deleted devices. Guarded
@@ -402,6 +416,48 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await _async_sync_device_areas(hass, entry, devices, cache, restored_from_tombstone)
 
     return True
+
+
+def _async_precreate_areas(
+    hass: HomeAssistant,
+    devices: dict[str, HaierDevice],
+) -> None:
+    """Ensure each new device's target area exists before platform setup.
+
+    Called just before ``async_forward_entry_setups`` so the area-registry
+    ``create`` events propagate to the frontend early (during the rest of
+    setup), instead of racing the "Name and assign" dialog that pops up the
+    moment the config flow finishes. See the call site for why this matters.
+
+    Scope guard: only areas for *new* devices (not yet in the device registry)
+    are (get-or-)created. These are exactly the devices that will trigger the
+    ``DeviceInfo.suggested_area`` creation path and appear in the dialog. This
+    deliberately avoids touching devices HA already knows about, so a reload
+    never resurrects an empty managed area for a device the user manually moved
+    to a custom area or whose managed area was renamed/removed.
+
+    Uses ``async_get_or_create`` (by name), matching how ``suggested_area`` and
+    :func:`_reconcile_device_area` resolve areas, so no duplicate areas are
+    created and final area assignment is unchanged.
+    """
+    area_reg = ar.async_get(hass)
+    dev_reg = dr.async_get(hass)
+
+    for device in devices.values():
+        name = device.suggested_area
+        if not name:
+            continue
+        if dev_reg.async_get_device(identifiers={(DOMAIN, device.device_id)}) is not None:
+            # Existing device: HA ignores suggested_area on re-registration and
+            # _reconcile_device_area handles its area later. Skip to avoid
+            # recreating an area the user may have changed.
+            continue
+        try:
+            area_reg.async_get_or_create(name)
+        except Exception:
+            # Best-effort pre-warm: a bad/duplicate name must not abort setup.
+            # The normal suggested_area/reconcile paths still run afterwards.
+            _LOGGER.debug("Failed to pre-create area %r; continuing", name, exc_info=True)
 
 
 def _async_cleanup_orphan_devices(
@@ -625,7 +681,7 @@ def _tombstone_belongs_to_entry(del_device: object, entry_id: str) -> bool:
     multi = getattr(del_device, "config_entries", _UNSET)
     if multi is not _UNSET:
         has_shape = True
-        if multi and entry_id in multi:
+        if isinstance(multi, Collection) and entry_id in multi:
             return True
 
     return not has_shape

@@ -27,8 +27,8 @@ repos:
         language: system
         types: [text]
         args:
-          - --ignore-words-list=aiport,astroid,checkin,currenty,hass,iif,incomfort,lookin,nam,NotIn
-          - --skip="./.*,*.csv,*.json,*.ambr"
+          - --ignore-words-list=aiport,astroid,checkin,currenty,hass,iif,incomfort,lookin,nam,NotIn,unparseable
+          - --skip=./.*,*.csv,*.json,*.ambr
           - --quiet-level=2
         exclude_types: [csv, json, html]
 

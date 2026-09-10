@@ -201,12 +201,14 @@ class HaierHomeConfigFlow(config_entry_oauth2_flow.AbstractOAuth2FlowHandler, do
         self, data: dict[str, Any]
     ) -> config_entries.ConfigFlowResult:
         """Create config entry after OAuth2 authorization."""
-        self._token = data.get("token")
-        if not isinstance(self._token, dict) or not self._token.get("access_token"):
+        token = data.get("token")
+        if not isinstance(token, dict) or not token.get("access_token"):
             return self.async_abort(reason="token_unset")
-        self._auth_implementation = data.get("auth_implementation")
-        if not self._auth_implementation:
+        self._token = token
+        auth_implementation = data.get("auth_implementation")
+        if not isinstance(auth_implementation, str) or not auth_implementation:
             return self.async_abort(reason="auth_implementation_unset")
+        self._auth_implementation = auth_implementation
 
         try:
             self._http_client = HaierHttpClient(

@@ -5,6 +5,7 @@ import random
 import string
 import time
 import uuid
+from collections.abc import Mapping
 from typing import Any
 
 _LOGGER = logging.getLogger(__name__)
@@ -97,7 +98,7 @@ def validate_token_structure(token: Any) -> None:
         raise ValueError(f"Token missing required field(s): {', '.join(missing)}")
 
 
-def validate_entry_data(data: dict[str, Any]) -> None:
+def validate_entry_data(data: Mapping[str, Any]) -> None:
     """Validate the config-flow-produced entry data; raise on invalid input.
 
     The single place that checks the shape of ``config_entry.data`` at setup, so

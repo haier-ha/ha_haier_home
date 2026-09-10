@@ -231,10 +231,14 @@ class HaierHttpClient:
         _LOGGER.debug("Making %s request to %s", method, url)
         await self._ensure_session()
         assert self._session is not None
+        # Bind the narrowed session locally: mypy does not carry the outer
+        # ``assert`` narrowing into the nested ``_send`` closure, and the
+        # session is guaranteed present for the lifetime of this request.
+        session = self._session
 
         async def _send() -> Any:
             req_kwargs = await self._build_auth_kwargs(url, endpoint, signature_required, kwargs)
-            async with self._session.request(method, url, **req_kwargs) as resp:
+            async with session.request(method, url, **req_kwargs) as resp:
                 try:
                     resp.raise_for_status()
                 except aiohttp.ClientResponseError as err:
@@ -260,7 +264,7 @@ class HaierHttpClient:
                         retry_kwargs = await self._build_auth_kwargs(
                             url, endpoint, signature_required, kwargs
                         )
-                        async with self._session.request(method, url, **retry_kwargs) as retry_resp:
+                        async with session.request(method, url, **retry_kwargs) as retry_resp:
                             retry_resp.raise_for_status()
                             return await self._parse_response(retry_resp, endpoint)
                     _LOGGER.warning(

@@ -555,6 +555,12 @@ class _FakeAreaRegistry:
         self.created.append(name)
         return area
 
+    def async_get_or_create(self, name):
+        existing = self.async_get_area_by_name(name)
+        if existing is not None:
+            return existing
+        return self.async_create(name)
+
 
 class _FakeReconcileRegDevice:
     def __init__(self, device_id, identifiers, area_id=None):
@@ -829,6 +835,84 @@ class TestReconcileDeviceArea:
         _reconcile_device_area(dev_reg, area_reg, device, cache, restored=True)
 
         assert reg_device.area_id is None
+
+
+class _FakePrecreateDevReg:
+    """Device registry whose known devices are given by identifier set."""
+
+    def __init__(self, known_device_ids):
+        self._known = set(known_device_ids)
+
+    def async_get_device(self, identifiers):
+        for domain, value in identifiers:
+            if domain == DOMAIN and value in self._known:
+                return SimpleNamespace(id=f"reg_{value}")
+        return None
+
+
+class TestPrecreateAreas:
+    """_async_precreate_areas warms the area registry for *new* devices only."""
+
+    def _patch(self, monkeypatch, area_reg, dev_reg):
+        import custom_components.haier_home as init_mod
+
+        monkeypatch.setattr(init_mod, "ar", SimpleNamespace(async_get=lambda hass: area_reg))
+        monkeypatch.setattr(init_mod, "dr", SimpleNamespace(async_get=lambda hass: dev_reg))
+        return init_mod
+
+    def test_creates_area_for_new_device(self, monkeypatch):
+        area_reg = _FakeAreaRegistry()
+        dev_reg = _FakePrecreateDevReg(known_device_ids=set())  # device is new
+        init_mod = self._patch(monkeypatch, area_reg, dev_reg)
+        devices = {
+            "device_001": _make_device("device_001", "家庭1 一层 客厅", ["家庭1 一层 客厅"]),
+        }
+
+        init_mod._async_precreate_areas(SimpleNamespace(), devices)
+
+        assert area_reg.created == ["家庭1 一层 客厅"]
+
+    def test_skips_existing_device(self, monkeypatch):
+        area_reg = _FakeAreaRegistry()
+        dev_reg = _FakePrecreateDevReg(known_device_ids={"device_001"})  # already known
+        init_mod = self._patch(monkeypatch, area_reg, dev_reg)
+        devices = {
+            "device_001": _make_device("device_001", "家庭1 一层 客厅", ["家庭1 一层 客厅"]),
+        }
+
+        init_mod._async_precreate_areas(SimpleNamespace(), devices)
+
+        # Existing device: suggested_area is ignored on re-registration and
+        # reconcile handles it later, so no area is pre-created here.
+        assert area_reg.created == []
+
+    def test_skips_device_without_suggested_area(self, monkeypatch):
+        area_reg = _FakeAreaRegistry()
+        dev_reg = _FakePrecreateDevReg(known_device_ids=set())
+        init_mod = self._patch(monkeypatch, area_reg, dev_reg)
+        devices = {
+            "device_001": _make_device("device_001", None, []),  # mode "none"
+        }
+
+        init_mod._async_precreate_areas(SimpleNamespace(), devices)
+
+        assert area_reg.created == []
+
+    def test_deduplicates_and_reuses_existing_area(self, monkeypatch):
+        # One area already exists; two new devices share the same target name.
+        existing = _FakeArea("a1", "家庭1 一层 客厅")
+        area_reg = _FakeAreaRegistry([existing])
+        dev_reg = _FakePrecreateDevReg(known_device_ids=set())
+        init_mod = self._patch(monkeypatch, area_reg, dev_reg)
+        devices = {
+            "device_001": _make_device("device_001", "家庭1 一层 客厅", ["家庭1 一层 客厅"]),
+            "device_002": _make_device("device_002", "家庭1 一层 客厅", ["家庭1 一层 客厅"]),
+        }
+
+        init_mod._async_precreate_areas(SimpleNamespace(), devices)
+
+        # Existing area is reused (get-or-create), so nothing new is created.
+        assert area_reg.created == []
 
 
 class TestCollectTombstonedDeviceIds:

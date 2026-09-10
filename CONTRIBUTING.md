@@ -1,6 +1,6 @@
 # 贡献指南（Contributing）
 
-感谢你愿意为 Haier Home 集成做贡献。以下约定用于保证协作顺畅与代码质量一致。
+感谢你愿意为 Haier Smart Home 集成做贡献。以下约定用于保证协作顺畅与代码质量一致。
 
 ## 本地开发环境
 
@@ -13,16 +13,39 @@
 
 ```
 custom_components/haier_home/
-├── __init__.py            # 组件入口与平台加载
-├── const.py               # 常量、端点与设备类型映射
-├── climate.py             # 空调平台
-├── coordinator.py         # 数据协调器：令牌刷新与 WebSocket 生命周期
-├── config_flow.py         # 配置向导
-└── haier/
-    ├── http_client.py     # 云 API 客户端
-    ├── websocket_client.py# 实时状态 WebSocket 客户端
-    └── oauth2.py          # OAuth2 认证
+├── __init__.py                 # 集成入口：协调器 / 扩展加载 / 平台转发
+├── application_credentials.py  # OAuth Application Credentials 助手
+├── climate.py                  # HA Climate 实体平台（空调）
+├── config_flow.py              # 配置向导（OAuth + 区域/语言 + 同步选项）
+├── const.py                    # 常量（域名、API 地址、PLATFORMS、DEVICE_TYPE_MAP 等）
+├── device.py                   # 设备数据模型（HaierDevice / Attribute / ValueRange）
+├── entity.py                   # 实体基类 HaierDeviceEntity（含 @register 装饰器）
+├── scene.py                    # HA Scene 实体平台（场景）
+├── icons.json                  # 平台图标定义
+├── manifest.json               # HACS 清单
+├── brand/                      # 品牌图标资源（icon.png、icon@2x.png）
+├── extend/                     # 按 PID 的差异扩展（自动发现加载）
+│   ├── __init__.py             # load_extensions() 阻塞扫描入口
+│   └── common_ab.py            # 公共 PID 覆写示例
+├── translations/               # HA 前端翻译
+│   ├── en.json
+│   └── zh-Hans.json
+└── haier/                      # 海尔 API 客户端包
+    ├── __init__.py
+    ├── command_debouncer.py    # 命令去抖（合并短时间内的重复下发）
+    ├── coordinator.py          # 数据协调器：令牌刷新 + WebSocket 生命周期
+    ├── flow_i18n.py            # 配置流语言文案 translate() 加载器
+    ├── http_client.py          # 云 API 客户端
+    ├── oauth2.py               # OAuth2 认证
+    ├── storage.py              # 本地持久化缓存
+    ├── utils.py                # 通用工具函数（ID 生成等）
+    ├── websocket_client.py     # 实时状态 WebSocket 客户端
+    └── i18n/                   # 配置流语言文案表
+        ├── en.json
+        └── zh-Hans.json
 ```
+
+> 完整架构说明（平台优先级、PID 扩展机制等）见 `README.md` 的「技术架构」与「开发指南」。
 
 ## 开发约定
 

@@ -432,10 +432,13 @@ class HaierClimateEntity(HaierDeviceEntity, ClimateEntity):
         # stable tiebreaker so unlisted modes don't get reshuffled.
         rank = {name: i for i, name in enumerate(self.FAN_MODE_ORDER)}
         tail = len(self.FAN_MODE_ORDER)
-        return sorted(
-            modes,
-            key=lambda name, m=modes: (rank.get(name, tail + m.index(name)),),
-        )
+
+        def _sort_key(name: str) -> tuple[int]:
+            # Known modes sort by FAN_MODE_ORDER; unknown ones keep their
+            # relative position via ``modes.index`` offset past the known tail.
+            return (rank.get(name, tail + modes.index(name)),)
+
+        return sorted(modes, key=_sort_key)
 
     @property
     def supported_features(self) -> ClimateEntityFeature:
