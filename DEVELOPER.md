@@ -4,8 +4,8 @@
 
 ## 环境要求
 
-- Python 3.14+
-- Home Assistant Core 2026.5+
+- Python 3.14.2+（见 `pyproject.toml` 的 `requires-python`）
+- Home Assistant Core 2026.9+（dev 依赖锁定 `homeassistant==2026.9.1`）
 - Conda (推荐) 或其他虚拟环境管理工具
 
 ## 开发环境设置
@@ -68,18 +68,13 @@ Ruff 的配置位于 `pyproject.toml` 文件中：
 
 ```toml
 [tool.ruff]
-required-version = ">=0.15.1"
-line-length = 88
+required-version = "0.16.3"
+line-length = 100
 target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "C4", "UP", "PL", "SIM", "RET", "BLE", "SLF", "TRY"]
-ignore = [
-    "E501",  # 行太长
-    "B006",  # 危险的默认值
-    "C901",  # 函数太复杂
-    # ... 其他忽略规则
-]
+# 具体忽略规则见 pyproject.toml 的 [tool.ruff.lint].ignore
 ```
 
 ## Git Pre-commit 钩子
@@ -101,12 +96,10 @@ pre-commit autoupdate
 
 配置文件位于 `.pre-commit-config.yaml`，包含以下钩子：
 
-- `ruff-check`: Ruff 代码检查
+- `ruff-check`: Ruff 代码检查（含 `--fix`）
 - `ruff-format`: Ruff 代码格式化
 - `codespell`: 拼写检查
-- `check-json`: JSON 文件格式检查
 - `yamllint`: YAML 文件格式检查
-- `prettier`: 通用代码格式化
 - `mypy`: 类型检查
 - `pytest`: 单元测试
 
@@ -120,7 +113,7 @@ pre-commit run --all-files
 pre-commit run ruff-check
 
 # 跳过某个钩子
-SKIP=prettier pre-commit run --all-files
+SKIP=mypy pre-commit run --all-files
 ```
 
 ## 单元测试

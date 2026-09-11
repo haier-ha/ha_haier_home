@@ -24,12 +24,14 @@
 
 ## 安装方式
 
-### 方式一：HACS（推荐）
+> 本集成尚未进入 HACS 默认商店，也不是 Home Assistant 内置集成，需按下方方式手动添加。
 
-1. 打开 Home Assistant
-2. 进入 HACS > 集成
-3. 搜索 "Haier Smart Home"
-4. 点击安装
+### 方式一：HACS 自定义仓库（推荐）
+
+1. 打开 HACS，右上角菜单选择 **Custom repositories**
+2. 仓库地址填 `https://github.com/haier-ha/ha_haier_home`，类别选 **Integration**
+3. 添加后在 HACS 中搜索 **Haier Smart Home** 并下载
+4. 重启 Home Assistant
 
 ### 方式二：手动安装
 
@@ -37,6 +39,8 @@
 cd /path/to/homeassistant/custom_components
 git clone https://github.com/haier-ha/ha_haier_home.git haier_home
 ```
+
+安装后重启 Home Assistant。
 
 ## 配置
 

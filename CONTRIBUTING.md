@@ -4,10 +4,13 @@
 
 ## 本地开发环境
 
-- Python 3.14+
-- 安装开发依赖：`pip install -e ".[dev]"`（或在项目内虚拟环境中执行）
-- 运行测试：`python -m pytest tests/`
-- 代码风格检查：`ruff check .`
+环境搭建、测试、lint、pre-commit 等完整命令见 [`DEVELOPER.md`](DEVELOPER.md)。快速上手：
+
+```bash
+pip install -e ".[dev]"   # 安装开发依赖（等价于 requirements_dev.txt）
+python -m pytest tests/    # 运行测试
+ruff check .               # 代码风格检查
+```
 
 ## 代码结构
 
