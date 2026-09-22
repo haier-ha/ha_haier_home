@@ -2,7 +2,222 @@
   <img src="./custom_components/haier_home/brand/icon@2x.png" alt="Haier" width="200">
 </p>
 
+<p align="center">
+  <a href="#haier-smart-home---home-assistant-integration">English</a> | <a href="#haier-smart-home---home-assistant-集成">简体中文</a>
+</p>
+
+---
+
 # Haier Smart Home - Home Assistant Integration
+
+<p align="right"><a href="#haier-smart-home---home-assistant-集成">切换到简体中文 →</a></p>
+
+Home Assistant integration for Haier Smart Home, supporting control and state synchronization of Haier air conditioner devices.
+
+## Features
+
+- ✅ OAuth2 account authentication
+- ✅ Real-time state sync over WebSocket
+- ✅ Air conditioner control (`climate` platform)
+  - Power on/off (always available)
+  - Mode switching (cool / heat / dry / fan_only / auto)
+  - Temperature adjustment (enabled when the device's `targetTemperature` is writable)
+  - Fan speed control (enabled when the device's `windSpeed` is writable)
+  - Indoor temperature display (`indoorTemperature`)
+- ✅ Scene sync (`scene` platform): Haier cloud manual scenes are exposed as HA scene entities
+- ✅ Multi-language config wizard (简体中文 / English)
+
+> The HVAC modes actually exposed depend on the intersection of the device-reported
+> `operationMode` enum and the integration's mapping table (`MODE_NAME_MAP` in
+> `climate.py`). `OFF` is always present.
+
+## Installation
+
+> This integration is not yet in the HACS default store, nor is it a built-in Home
+> Assistant integration. It must be added manually using one of the methods below.
+
+### Option 1: HACS custom repository (recommended)
+
+1. Open HACS, and from the top-right menu choose **Custom repositories**
+2. Enter the repository URL `https://github.com/haier-ha/ha_haier_home` and select the **Integration** category
+3. After adding, search for **Haier Smart Home** in HACS and download it
+4. Restart Home Assistant
+
+### Option 2: Manual installation
+
+```bash
+cd /path/to/homeassistant/custom_components
+git clone https://github.com/haier-ha/ha_haier_home.git haier_home
+```
+
+Restart Home Assistant after installation.
+
+## Configuration
+
+1. In Home Assistant, go to **Settings** > **Devices & Services**
+2. Click **Add Integration**
+3. Search for **Haier Smart Home**
+4. Follow the wizard to complete Haier account authorization
+
+## Language behavior
+
+The "Region & Language" step of the config wizard offers a `language` option
+(中文 / English) that controls two kinds of content simultaneously:
+
+- **Language of cloud-returned data**: used as the `Accept-Language` request header,
+  determining the language of API data such as device names, home names, and the body
+  of the risk disclosure.
+- **UI text after the language is chosen**: the titles, descriptions, field labels, and
+  selector options of the `oauth`, `homes`, and options flow (re-sync, etc.) pages follow
+  the chosen option, **independent of HA's global frontend language**. This text is
+  provided by the built-in text table `haier/flow_i18n.py` and injected via
+  `description_placeholders` and explicit selector labels.
+
+Constraints and fallback:
+
+- The two steps "Risk disclosure (eula)" and "Region & Language (region)" appear **before**
+  a language is selected, so they still follow HA's frontend language. Because the
+  integration only ships `en.json` and `zh-Hans.json`, **non-Simplified-Chinese
+  environments automatically fall back to English**.
+- The language of the risk disclosure body is decided by HA's global language:
+  Simplified Chinese → Chinese, everything else (including English and other languages) → English.
+
+> Maintenance note: text on pages after the language is chosen is sourced from
+> `haier/i18n/<lang>.json` (loaded by `translate()` in `haier/flow_i18n.py`); the
+> corresponding fields in `translations/*.json` use `{placeholders}`, injected at runtime
+> via `description_placeholders` and explicit selector labels. See
+> `docs/config_flow_language_option_design.md` for details.
+
+## Supported devices
+
+The integration determines whether a device is supported via the Haier `appTypeCode`:
+if it matches the table below, it is recognized as an air conditioner (internal type
+`AC`) and a `climate` entity is created; unmatched devices are skipped. The mapping is
+defined in `DEVICE_TYPE_MAP` in `const.py`.
+
+| appTypeCode | Internal type |
+|-------------|---------------|
+| `A177` | AC (air conditioner) |
+| `A178` | AC (air conditioner) |
+| `A120` | AC (air conditioner) |
+
+> A device's concrete capabilities (available modes, whether fan speed/temperature
+> adjustment is supported, whether indoor temperature is reported) are determined
+> dynamically by the device's `digital model` attributes, rather than hardcoded per model.
+
+## Technical architecture
+
+> Currently implemented HA platforms: `climate` (air conditioner) and `scene`, see
+> `PLATFORMS` in `const.py`.
+
+```
+custom_components/
+└── haier_home/
+    ├── __init__.py                 # Integration entry: coordinator / extension loading / platform forwarding
+    ├── application_credentials.py  # OAuth Application Credentials helper
+    ├── climate.py                  # HA Climate entity platform
+    ├── config_flow.py              # Config flow (OAuth + region/language + sync options)
+    ├── const.py                    # Constants (domain, API URLs, PLATFORMS, etc.)
+    ├── device.py                   # Device data models (HaierDevice / Attribute / ValueRange)
+    ├── entity.py                   # Entity base class HaierDeviceEntity (with @register decorator)
+    ├── icons.json                  # Platform icon definitions
+    ├── manifest.json               # HACS manifest
+    ├── scene.py                    # HA Scene entity platform
+    ├── brand/                      # Brand icon assets
+    │   ├── icon.png
+    │   └── icon@2x.png
+    ├── extend/                     # Per-PID difference extensions (auto-discovered and loaded)
+    │   ├── __init__.py             # load_extensions() blocking scan entry point
+    │   └── common_ab.py            # Shared PID override example
+    ├── translations/               # HA frontend translations
+    │   ├── en.json
+    │   └── zh-Hans.json
+    └── haier/                      # Haier API client package
+        ├── __init__.py
+        ├── command_debouncer.py    # Command debouncing (merges repeated commands within a short window)
+        ├── coordinator.py          # Data coordinator: state sync + WebSocket lifecycle
+        ├── flow_i18n.py            # Config flow text translate() loader
+        ├── http_client.py          # REST API client
+        ├── oauth2.py               # OAuth2 implementation
+        ├── storage.py              # Local persistent cache
+        ├── utils.py                # Common utility functions (ID generation, etc.)
+        ├── websocket_client.py     # WebSocket client (real-time state / command dispatch)
+        └── i18n/                   # Config flow text tables
+            ├── en.json
+            └── zh-Hans.json
+
+```
+
+### Three-level entity inheritance
+
+Device differences are handled at the **Entity layer**; `HaierDevice` is a pure data
+container (no inheritance needed):
+
+- **Level 1 `HaierDeviceEntity`** (`entity.py`): logic shared by all devices — coordinator
+  binding, availability, `get_value` / `send_command`, plus generic read/write utilities
+  for `valueRange` (numeric min/max/step, enum options, boolean read/write).
+- **Level 2 platform base classes** (e.g. `HaierClimateEntity` in `climate.py`): mix in the
+  HA platform base class and provide the platform's default implementation.
+- **Level 3 PID extensions** (`extend/*.py`): override differences per PID, self-registering
+  with `@HaierDeviceEntity.register(pid, platform)`. Passing `pid` as a **single string**
+  registers to the *specific* registry; passing a **list of strings** registers each PID to
+  the *generic* registry. Platform-level fallbacks use
+  `@HaierDeviceEntity.register_platform(platform)` (`HaierClimateEntity` is registered this
+  way as the default class for the climate platform).
+
+The platform entry point automatically selects the correct class by `(PID, platform)` via
+`HaierDeviceEntity.create()`, with lookup priority specific → generic → platform → base
+class (`HaierDeviceEntity` itself).
+
+## Development guide
+
+### Extending entities by PID
+
+When you find a PID that behaves differently from the platform default, just create a
+self-contained file under `extend/` — **no need to modify any existing files**
+(`extend/__init__.py` auto-discovers and loads it):
+
+```python
+# custom_components/haier_home/extend/pid_x.py
+from ..climate import HaierClimateEntity
+from ..entity import HaierDeviceEntity
+
+
+# A list of strings registers each PID to the generic registry;
+# to override a single PID, pass a string directly (registers to the specific registry).
+@HaierDeviceEntity.register(["pid_common_a", "pid_common_b"], "climate")
+class CommonABClimateEntity(HaierClimateEntity):
+    """Override only what differs from the default (here, the operationMode mapping)."""
+
+    # Note: keys must be strings — lookups use MODE_NAME_MAP.get(str(v)),
+    # so integer keys will never match and the override silently fails.
+    MODE_NAME_MAP = {
+        "0": "auto",
+        "1": "cool",
+        "2": "heat",
+        "3": "dry",
+        "6": "fan_only",
+    }
+```
+
+> The example above is taken from `extend/common_ab.py`. The default mapping is in
+> `MODE_NAME_MAP` in `climate.py` (`0→auto, 1→cool, 2→dry, 4→heat, 6→fan_only`).
+
+If a PID behaves exactly like the platform default, no extension file is needed.
+
+## License
+
+Apache License 2.0
+
+## Contributing
+
+Issues and Pull Requests are welcome!
+
+---
+
+# Haier Smart Home - Home Assistant 集成
+
+<p align="right"><a href="#haier-smart-home---home-assistant-integration">Switch to English →</a></p>
 
 海尔智能家居 Home Assistant 集成，支持海尔空调设备的控制与状态同步。
 
